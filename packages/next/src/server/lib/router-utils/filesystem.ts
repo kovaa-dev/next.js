@@ -136,7 +136,7 @@ const sortDynamicRoutes = (
 
 export const buildCustomRoute = <T>(
   type: 'redirect' | 'header' | 'rewrite' | 'before_files_rewrite',
-  item: T & { source: string },
+  item: T & { source: string; internal?: boolean },
   basePath?: string,
   caseSensitive?: boolean
 ): T & { match: PatchMatcher; check?: boolean; regex: string } => {
@@ -148,7 +148,7 @@ export const buildCustomRoute = <T>(
     strict: true,
     removeUnnamedParams: true,
     regexModifier: (regex: string) => {
-      if (!(item as any).internal) {
+      if (!item.internal) {
         regex = modifyRouteRegex(
           regex,
           type === 'redirect' ? restrictedRedirectPaths : undefined

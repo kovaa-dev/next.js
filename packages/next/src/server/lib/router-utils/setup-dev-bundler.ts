@@ -163,7 +163,7 @@ export type ServerFields = {
   middleware?:
     | {
         page: string
-        match: MiddlewareRouteMatch
+        match: MiddlewareRouteMatch | null
         matchers?: ProxyMatcher[]
       }
     | undefined
@@ -1242,7 +1242,7 @@ async function startWatcher(
       // TODO: pass this to fsChecker/next-dev-server?
       serverFields.middleware = middlewareMatchers
         ? {
-            match: null as any,
+            match: null,
             page: '/',
             matchers: middlewareMatchers,
           }

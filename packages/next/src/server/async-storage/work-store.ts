@@ -119,7 +119,7 @@ function createWorkStoreImpl(
     incrementalCache:
       // we fallback to a global incremental cache for edge-runtime locally
       // so that it can access the fs cache without mocks
-      renderOpts.incrementalCache || (globalThis as any).__incrementalCache,
+      renderOpts.incrementalCache || globalThis.__incrementalCache,
     cacheLifeProfiles: renderOpts.cacheLifeProfiles,
     useCacheTimeout: renderOpts.experimental.useCacheTimeout,
     durableUseCacheEntries: renderOpts.experimental.durableUseCacheEntries,

@@ -558,15 +558,14 @@ export function onDemandEntryHandler({
   appDir?: string
 }) {
   const hasAppDir = !!appDir
-  let curInvalidator: Invalidator = getInvalidator(
-    multiCompiler.outputPath
-  ) as any
+  let maybeInvalidator = getInvalidator(multiCompiler.outputPath)
   const curEntries = getEntries(multiCompiler.outputPath)
 
-  if (!curInvalidator) {
-    curInvalidator = new Invalidator(multiCompiler)
-    invalidators.set(multiCompiler.outputPath, curInvalidator)
+  if (!maybeInvalidator) {
+    maybeInvalidator = new Invalidator(multiCompiler)
+    invalidators.set(multiCompiler.outputPath, maybeInvalidator)
   }
+  const curInvalidator = maybeInvalidator
 
   // Deferred entries state management
   const deferredEntriesConfig = nextConfig.experimental.deferredEntries

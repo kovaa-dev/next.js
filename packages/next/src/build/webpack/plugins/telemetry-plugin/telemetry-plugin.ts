@@ -145,7 +145,7 @@ function findFeatureInModule(module: webpack.Module): Feature | undefined {
  * dependency.
  */
 function findUniqueOriginModulesInConnections(
-  connections: Connection[],
+  connections: Iterable<Connection>,
   originModule: webpack.Module
 ): Set<unknown> {
   const originModules = new Set()
@@ -217,9 +217,8 @@ export class TelemetryPlugin implements webpack.WebpackPluginInstance {
               if (!feature) {
                 continue
               }
-              const connections = (
-                compilation as any
-              ).moduleGraph.getIncomingConnections(module)
+              const connections =
+                compilation.moduleGraph.getIncomingConnections(module)
               const originModules = findUniqueOriginModulesInConnections(
                 connections,
                 module

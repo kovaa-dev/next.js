@@ -73,6 +73,13 @@ interface TransitionOptions {
   locale?: string | false
   scroll?: boolean
   unstable_skipClientCache?: boolean
+  /**
+   * @internal Set to `1` for the hydration-time query update and `0` for
+   * `onPopState` replays. Apps must never pass this.
+   */
+  _h?: 0 | 1
+  /** @internal Whether `change()` should resolve `href` against rewrites. */
+  _shouldResolveHref?: boolean
 }
 
 interface NextHistoryState {
@@ -456,6 +463,12 @@ export type CompletePrivateRouteInfo = {
   route?: string
   resolvedAs?: string
   query?: ParsedUrlQuery
+  /**
+   * @internal Set only on the `{ __appRouter: true }` marker that `prefetch()`
+   * stores in `router.components` (see `getAppRouterMarkerKey`). Such an entry
+   * has none of the other fields and must never be rendered.
+   */
+  __appRouter?: true
 }
 
 export type AppProps = Pick<CompletePrivateRouteInfo, 'Component' | 'err'> & {
@@ -918,7 +931,7 @@ export default class Router implements BaseRouter {
         }).then((matches) => {
           // if middleware matches we leave resolving to the change function
           // as the server needs to resolve for correct priority
-          ;(options as any)._shouldResolveHref = as !== pathname
+          options._shouldResolveHref = as !== pathname
 
           this.changeState(
             'replaceState',
@@ -1041,7 +1054,6 @@ export default class Router implements BaseRouter {
       Object.assign<{}, TransitionOptions, TransitionOptions>({}, options, {
         shallow: options.shallow && this._shallow,
         locale: options.locale || this.defaultLocale,
-        // @ts-ignore internal value not exposed on types
         _h: 0,
       }),
       forcedScroll
@@ -1267,7 +1279,7 @@ export default class Router implements BaseRouter {
     // WARNING: `_h` is an internal option for handing Next.js client-side
     // hydration. Your app should _never_ use this property. It may change at
     // any time without notice.
-    const isQueryUpdating = (options as any)._h === 1
+    const isQueryUpdating = options._h === 1
 
     if (!isQueryUpdating && !options.shallow) {
       await this._bfl(as, undefined, options.locale)
@@ -1275,7 +1287,7 @@ export default class Router implements BaseRouter {
 
     let shouldResolveHref =
       isQueryUpdating ||
-      (options as any)._shouldResolveHref ||
+      options._shouldResolveHref ||
       parsePath(url).pathname === parsePath(as).pathname
 
     const nextState = {
@@ -1506,8 +1518,8 @@ export default class Router implements BaseRouter {
     )
     if (
       (appRouterMarkerKey !== null &&
-        (this.components[appRouterMarkerKey] as any)?.__appRouter) ||
-      (this.components[route] as any)?.__appRouter
+        this.components[appRouterMarkerKey]?.__appRouter) ||
+      this.components[route]?.__appRouter
     ) {
       handleHardNavigation({ url: as, router: this })
       return new Promise(() => {})
@@ -1535,7 +1547,7 @@ export default class Router implements BaseRouter {
     }
 
     if (shouldResolveHref && pathname !== '/_error') {
-      ;(options as any)._shouldResolveHref = true
+      options._shouldResolveHref = true
 
       if (process.env.__NEXT_HAS_REWRITES && as.startsWith('/')) {
         const rewritesResult = resolveRewrites(
@@ -1627,7 +1639,7 @@ export default class Router implements BaseRouter {
     // A config rewrite can resolve `href` to another pages route after the
     // marker guard above ran. That route can hold a marker from an earlier
     // prefetch, so check it again before `getRouteInfo()` reads the cache.
-    if ((this.components[route] as any)?.__appRouter) {
+    if (this.components[route]?.__appRouter) {
       handleHardNavigation({ url: as, router: this })
       return new Promise(() => {})
     }
@@ -2148,7 +2160,7 @@ export default class Router implements BaseRouter {
       // marker is not route info: it has no `Component` and no `props`, so
       // rendering it crashes `_app`. Treat it as a cache miss and fetch the
       // route info again; `change()` is responsible for the hard navigation.
-      if (existingInfo && (existingInfo as any).__appRouter) {
+      if (existingInfo && existingInfo.__appRouter) {
         existingInfo = undefined
       }
 
@@ -2252,7 +2264,7 @@ export default class Router implements BaseRouter {
 
           // Check again the cache with the new destination.
           existingInfo = this.components[route]
-          if (existingInfo && (existingInfo as any).__appRouter) {
+          if (existingInfo && existingInfo.__appRouter) {
             existingInfo = undefined
           }
           if (

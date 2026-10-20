@@ -18,6 +18,13 @@ if (process.env.__NEXT_DEV_SERVER) {
   // resumed response emits that bootstrap after the runtime has loaded.
 }
 
+declare global {
+  interface Window {
+    /** @internal Queue of `beforeInteractive` scripts pushed by `next/script`. */
+    __next_s?: [src: string, props: { [prop: string]: any }][]
+  }
+}
+
 const version = process.env.__NEXT_VERSION
 
 window.next = {
@@ -26,7 +33,7 @@ window.next = {
 }
 
 function loadScriptsInSequence(
-  scripts: [src: string, props: { [prop: string]: any }][],
+  scripts: [src: string, props: { [prop: string]: any }][] | undefined,
   hydrate: () => void
 ) {
   if (!scripts || !scripts.length) {
@@ -66,7 +73,7 @@ function loadScriptsInSequence(
 }
 
 export function appBootstrap(hydrate: () => void) {
-  loadScriptsInSequence((self as any).__next_s, () => {
+  loadScriptsInSequence(self.__next_s, () => {
     // If the static shell is being debugged, skip hydration if the
     // `__nextppronly` query is present. This is only enabled when the
     // environment variable `__NEXT_EXPERIMENTAL_STATIC_SHELL_DEBUGGING` is

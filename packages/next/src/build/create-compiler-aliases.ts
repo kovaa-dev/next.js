@@ -21,7 +21,8 @@ import { browserVariantModules } from './browser-variant-modules'
 import { shouldUseReactServerCondition } from './utils'
 
 interface CompilerAliases {
-  [alias: string]: string | string[]
+  // `false` aliases a module to an empty module
+  [alias: string]: string | string[] | false
 }
 
 const isReact19 = typeof React.use === 'function'
@@ -171,7 +172,7 @@ export function createWebpackAliases({
           ],
 
           // disable typechecker, webpack5 allows aliases to be set to false to create a no-op module
-          'private-next-empty-module': false as any,
+          'private-next-empty-module': false,
 
           // In the browser bundle, swap every module that has a `.browser` sibling
           // (see browser-variant-modules.ts, generated from the filesystem) for that

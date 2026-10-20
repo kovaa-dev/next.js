@@ -237,7 +237,7 @@ export async function handler(
     ))
 
   incrementalCache?.resetRequestCache()
-  ;(globalThis as any).__incrementalCache = incrementalCache
+  globalThis.__incrementalCache = incrementalCache
 
   const context: AppRouteRouteHandlerContext = {
     params,

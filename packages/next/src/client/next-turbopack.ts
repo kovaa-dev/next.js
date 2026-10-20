@@ -16,8 +16,8 @@ window.next = {
   },
   emitter,
 }
-;(self as any).__next_set_public_path__ = () => {}
-;(self as any).__webpack_hash__ = ''
+self.__next_set_public_path__ = () => {}
+self.__webpack_hash__ = ''
 
 // for the page loader
 declare let __turbopack_load__: any
@@ -25,10 +25,7 @@ declare let __turbopack_load__: any
 initialize({})
   .then(() => {
     // for the page loader
-    ;(self as any).__turbopack_load_page_chunks__ = (
-      page: string,
-      chunksData: any
-    ) => {
+    self.__turbopack_load_page_chunks__ = (page: string, chunksData: any) => {
       const chunkPromises = chunksData.map((c: unknown) =>
         __turbopack_load__(c)
       )

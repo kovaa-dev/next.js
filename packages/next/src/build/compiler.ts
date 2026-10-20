@@ -59,7 +59,8 @@ export function runCompiler(
       compiler.inputFileSystem = inputFileSystem
     }
     compiler.fsStartTime = Date.now()
-    compiler.run((err, stats) => {
+    // webpack errors (e.g. `WebpackError`) may carry `details`
+    compiler.run((err: (Error & { details?: string }) | null, stats) => {
       const webpackCloseSpan = runWebpackSpan.traceChild('webpack-close', {
         name: config.name || 'unknown',
       })
@@ -71,7 +72,7 @@ export function runCompiler(
             if (reason) {
               return resolve([
                 {
-                  errors: [{ message: reason, details: (err as any).details }],
+                  errors: [{ message: reason, details: err.details }],
                   warnings: [],
                   stats,
                 },

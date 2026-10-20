@@ -862,7 +862,7 @@ export function createAppPageEntrypoint({
         ))
 
       incrementalCache?.resetRequestCache()
-      ;(globalThis as any).__incrementalCache = incrementalCache
+      globalThis.__incrementalCache = incrementalCache
 
       const doRender = async ({
         span,

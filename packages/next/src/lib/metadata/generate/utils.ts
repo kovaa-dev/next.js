@@ -7,11 +7,14 @@ function resolveArray<T>(value: T | T[]): T[] {
 
 function resolveAsArrayOrUndefined<T>(
   value: T | T[] | undefined | null
-): T extends undefined | null ? undefined : T[] {
+): T extends undefined | null ? undefined : T[]
+function resolveAsArrayOrUndefined<T>(
+  value: T | T[] | undefined | null
+): T[] | undefined {
   if (typeof value === 'undefined' || value === null) {
-    return undefined as any
+    return undefined
   }
-  return resolveArray(value) as any
+  return resolveArray(value)
 }
 
 function getOrigin(url: string | URL): string | undefined {

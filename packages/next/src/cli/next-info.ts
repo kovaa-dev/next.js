@@ -372,7 +372,7 @@ async function printVerboseInfo() {
       title: 'next-swc installation',
       scripts: {
         default: async () => {
-          const output = []
+          const output: string[] = []
 
           // First, try to load next-swc via loadBindings.
           try {

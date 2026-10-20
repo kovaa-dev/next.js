@@ -48,7 +48,7 @@ function isTerminalEditor(editor: string) {
 // Map from full process name to binary that starts the process
 // We can't just re-use full process name, because it will spawn a new instance
 // of the app every time
-const COMMON_EDITORS_MACOS = {
+const COMMON_EDITORS_MACOS: Record<string, string> = {
   '/Applications/Atom.app/Contents/MacOS/Atom': 'atom',
   '/Applications/Atom Beta.app/Contents/MacOS/Atom Beta':
     '/Applications/Atom Beta.app/Contents/MacOS/Atom Beta',
@@ -94,7 +94,7 @@ const COMMON_EDITORS_MACOS = {
     '/Applications/Cursor.app/Contents/MacOS/Cursor',
 }
 
-const COMMON_EDITORS_LINUX = {
+const COMMON_EDITORS_LINUX: Record<string, string> = {
   atom: 'atom',
   Brackets: 'brackets',
   code: 'code',
@@ -238,7 +238,7 @@ function guessEditor(): string[] {
       for (let i = 0; i < processNames.length; i++) {
         const processName = processNames[i]
         if (output.indexOf(processName) !== -1) {
-          return [(COMMON_EDITORS_MACOS as any)[processName]]
+          return [COMMON_EDITORS_MACOS[processName]]
         }
       }
     } else if (process.platform === 'win32') {
@@ -268,7 +268,7 @@ function guessEditor(): string[] {
       for (let i = 0; i < processNames.length; i++) {
         const processName = processNames[i]
         if (output.indexOf(processName) !== -1) {
-          return [(COMMON_EDITORS_LINUX as any)[processName] as string]
+          return [COMMON_EDITORS_LINUX[processName]]
         }
       }
     }

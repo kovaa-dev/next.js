@@ -3,7 +3,7 @@ import { appBootstrap } from './app-bootstrap'
 import { isRecoverableError } from './react-client-callbacks/on-recoverable-error'
 
 window.next.turbopack = true
-;(self as any).__webpack_hash__ = ''
+self.__webpack_hash__ = ''
 
 // eslint-disable-next-line @next/internal/typechecked-require
 const instrumentationModules = require('../lib/require-instrumentation-client')

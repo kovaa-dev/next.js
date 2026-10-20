@@ -814,13 +814,15 @@ async function writeRequiredServerFilesManifest(
   )
 }
 
+type ImagesManifestConfig = NextConfigComplete['images'] & { sizes?: number[] }
+
 async function writeImagesManifest(
   distDir: string,
   config: NextConfigComplete
 ): Promise<void> {
-  const images = { ...config.images }
+  const images: ImagesManifestConfig = { ...config.images }
   const { deviceSizes, imageSizes } = images
-  ;(images as any).sizes = [...deviceSizes, ...imageSizes]
+  images.sizes = [...deviceSizes, ...imageSizes]
 
   // By default, remotePatterns will allow no remote images ([])
   images.remotePatterns = (config?.images?.remotePatterns || []).map((p) => ({

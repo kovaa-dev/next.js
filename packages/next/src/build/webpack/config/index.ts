@@ -21,7 +21,6 @@ export async function buildConfiguration(
     assetPrefix,
     sassOptions,
     productionBrowserSourceMaps,
-    future,
     transpilePackages,
     experimental,
     disableStaticImages,
@@ -40,8 +39,6 @@ export async function buildConfiguration(
     sassOptions: any
     productionBrowserSourceMaps: boolean
     transpilePackages: NextConfigComplete['transpilePackages']
-    // @ts-expect-error TODO: remove any
-    future: NextConfigComplete['future']
     experimental: NextConfigComplete['experimental']
     disableStaticImages: NextConfigComplete['images']['disableStaticImages']
     serverSourceMaps: NextConfigComplete['experimental']['serverSourceMaps']
@@ -67,7 +64,6 @@ export async function buildConfiguration(
     sassOptions,
     productionBrowserSourceMaps,
     transpilePackages,
-    future,
     experimental,
     serverSourceMaps: serverSourceMaps ?? false,
     deploymentId,

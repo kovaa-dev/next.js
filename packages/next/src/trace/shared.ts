@@ -1,11 +1,16 @@
 import { randomBytes } from 'node:crypto'
 
-let _traceGlobals: Map<any, any> = (global as any)._traceGlobals
+declare global {
+  /** @internal */
+  var _traceGlobals: Map<any, any> | undefined
+}
+
+let _traceGlobals: Map<any, any> | undefined = global._traceGlobals
 
 if (!_traceGlobals) {
   _traceGlobals = new Map()
 }
-;(global as any)._traceGlobals = _traceGlobals
+global._traceGlobals = _traceGlobals
 
 export const traceGlobals: Map<any, any> = _traceGlobals
 export const setGlobal = (key: any, val: any) => {

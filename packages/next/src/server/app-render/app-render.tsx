@@ -10008,9 +10008,8 @@ async function prerenderToStream(
                     isPrerenderInterruptedError(err) ||
                     finalClientReactController.signal.aborted
                   ) {
-                    const componentStack: string | undefined = (
-                      errorInfo as any
-                    ).componentStack
+                    const componentStack: string | null | undefined =
+                      errorInfo.componentStack
                     if (typeof componentStack === 'string') {
                       if (ensureStaticLevel === EnsureStaticLevel.Navigation) {
                         trackDynamicAccessInStaticRoute(
@@ -10655,9 +10654,8 @@ async function prerenderToStream(
                     isPrerenderInterruptedError(clientError) ||
                     errorClientReactController.signal.aborted
                   ) {
-                    const componentStack: string | undefined = (
-                      errorInfo as any
-                    ).componentStack
+                    const componentStack: string | null | undefined =
+                      errorInfo.componentStack
                     if (typeof componentStack === 'string') {
                       trackAllowedDynamicAccess(
                         clientError,

@@ -23,7 +23,7 @@ if (getAssetToken()) {
 }
 
 // Ignore the module ID transform in client.
-;(self as any).__next_set_public_path__ = (path: string) => {
+self.__next_set_public_path__ = (path: string) => {
   __webpack_public_path__ = path
 }
 

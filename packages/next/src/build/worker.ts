@@ -7,7 +7,7 @@ import { installCodeFrameSupport } from '../server/lib/install-code-frame'
 import { isPageStatic as isPageStaticImpl } from './utils'
 
 // Set the global asset suffix for Turbopack compiled code to use during prerendering
-;(globalThis as any).NEXT_CLIENT_ASSET_SUFFIX =
+globalThis.NEXT_CLIENT_ASSET_SUFFIX =
   process.env.__NEXT_PRERENDER_CLIENT_ASSET_SUFFIX
 
 export { getDefinedNamedExports, hasCustomGetInitialProps } from './utils'

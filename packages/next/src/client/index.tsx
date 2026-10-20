@@ -60,6 +60,13 @@ declare global {
     /* prod */
     __NEXT_DATA__: NEXT_DATA
     __NEXT_P: any[]
+
+    /** @internal Sets the bundler's runtime public path (see client/webpack.ts). */
+    __next_set_public_path__?: (path: string) => void
+    /** @internal */
+    __webpack_hash__?: string
+    /** @internal Turbopack page chunk loader used by the page loader. */
+    __turbopack_load_page_chunks__?: (page: string, chunksData: any) => void
   }
 }
 type RenderRouteInfo = PrivateRouteInfo & {
@@ -139,7 +146,6 @@ class Container extends React.Component<{
             ),
           asPath,
           {
-            // @ts-ignore
             // WARNING: `_h` is an internal option for handing Next.js
             // client-side hydration. Your app should _never_ use this property.
             // It may change at any time without notice.

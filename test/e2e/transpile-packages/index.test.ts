@@ -1,10 +1,10 @@
 import path from 'path'
-import { FileRef, nextTestSetup } from 'e2e-utils'
+import { FileRef, nextTestSetup, isNextDeploy } from 'e2e-utils'
 
 describe('transpile packages', () => {
   // TODO(deploy-test-completion): Re-enable this suite in deploy mode.
   // No deploy-specific incompatibility is documented.
-  if ((global as any).isNextDeploy) {
+  if (isNextDeploy) {
     it('should skip for deploy mode for now', () => {})
     return
   }
@@ -16,7 +16,6 @@ describe('transpile packages', () => {
     },
   })
 
-  const { isNextDeploy } = global as any
   if (isNextDeploy) {
     it('should skip tests for next-deploy and react 17', () => {})
     return

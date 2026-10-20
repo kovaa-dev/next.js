@@ -1,7 +1,6 @@
 import cssnanoSimple from 'next/dist/compiled/cssnano-simple'
 import postcssScss from 'next/dist/compiled/postcss-scss'
 import postcss from 'postcss'
-import type { Parser } from 'postcss'
 import { webpack, sources } from 'next/dist/compiled/webpack/webpack'
 import { getCompilationSpan } from '../utils'
 
@@ -32,7 +31,7 @@ export class CssMinimizerPlugin {
       // We don't actually add this parser to support Sass. It can also be used
       // for inline comment support. See the README:
       // https://github.com/postcss/postcss-scss/blob/master/README.md#2-inline-comments-for-postcss
-      parser: postcssScss as any as Parser,
+      parser: postcssScss,
     }
 
     let input: string

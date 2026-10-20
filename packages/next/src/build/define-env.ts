@@ -56,6 +56,7 @@ interface DefineEnv {
     | NextConfigComplete['cacheLife']
     | I18NDomains
     | I18NConfig
+    | DefineEnvOptions['rewrites']
 }
 
 interface SerializedDefineEnv {
@@ -290,7 +291,7 @@ export function getDefineEnv({
     'process.env.__NEXT_CASE_SENSITIVE_ROUTES': Boolean(
       config.experimental.caseSensitiveRoutes
     ),
-    'process.env.__NEXT_REWRITES': rewrites as any,
+    'process.env.__NEXT_REWRITES': rewrites,
     'process.env.__NEXT_TRAILING_SLASH': config.trailingSlash,
     'process.env.__NEXT_DEV_INDICATOR': config.devIndicators !== false,
     'process.env.__NEXT_DEV_INDICATOR_POSITION':

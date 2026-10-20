@@ -783,7 +783,7 @@ export async function handleEntrypoints({
 
       if (dev && middlewareConfig) {
         dev.serverFields.middleware = {
-          match: null as any,
+          match: null,
           page: '/',
           matchers: middlewareConfig.matchers,
         }

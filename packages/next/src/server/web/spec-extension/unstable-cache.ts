@@ -108,8 +108,7 @@ export function unstable_cache<T extends Callback>(
     // We must be able to find the incremental cache otherwise we throw
     const maybeIncrementalCache:
       | import('../../lib/incremental-cache').IncrementalCache
-      | undefined =
-      workStore?.incrementalCache || (globalThis as any).__incrementalCache
+      | undefined = workStore?.incrementalCache || globalThis.__incrementalCache
 
     if (!maybeIncrementalCache) {
       throw new Error(

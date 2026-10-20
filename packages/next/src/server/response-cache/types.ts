@@ -33,6 +33,11 @@ export interface ResponseCacheBase {
   ): Promise<ResponseCacheResult>
 }
 
+declare global {
+  /** @internal */
+  var __serverComponentsHmrCache: ServerComponentsHmrCache | undefined
+}
+
 // The server components HMR cache might store other data as well in the future,
 // at which point this should be refactored to a discriminated union type.
 export interface ServerComponentsHmrCache {

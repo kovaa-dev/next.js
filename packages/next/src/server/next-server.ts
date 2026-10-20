@@ -2108,7 +2108,7 @@ export default class NextNodeServer extends BaseServer<
       onError: params.onError,
       onWarning: params.onWarning,
       incrementalCache:
-        (globalThis as any).__incrementalCache ||
+        globalThis.__incrementalCache ||
         getRequestMeta(params.req, 'incrementalCache'),
       serverComponentsHmrCache: getRequestMeta(
         params.req,

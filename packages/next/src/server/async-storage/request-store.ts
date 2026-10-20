@@ -343,8 +343,7 @@ export function createRequestStore(inputs: RequestStoreInputs): RequestStore {
     resumeDataCache: resumeDataCache ?? null,
     isHmrRefresh,
     serverComponentsHmrCache:
-      serverComponentsHmrCache ||
-      (globalThis as any).__serverComponentsHmrCache,
+      serverComponentsHmrCache || globalThis.__serverComponentsHmrCache,
     hmrRefreshHash,
     stagedFallbackParams,
     usedDynamic: false,

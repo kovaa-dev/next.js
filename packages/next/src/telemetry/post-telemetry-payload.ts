@@ -30,7 +30,7 @@ export function postNextTelemetryPayload(payload: Payload, signal?: any) {
         }).then((res) => {
           if (!res.ok) {
             const err = new Error(res.statusText)
-            ;(err as any).response = res
+            Object.assign(err, { response: res })
             throw err
           }
         }),

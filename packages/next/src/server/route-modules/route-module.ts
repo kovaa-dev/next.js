@@ -385,7 +385,9 @@ export abstract class RouteModule<
           shouldCache: !this.isDev,
         }),
         router === 'app' && !isStaticMetadataRoute(srcPage)
-          ? evalManifestFromRelativePath({
+          ? evalManifestFromRelativePath<{
+              __RSC_MANIFEST?: Record<string, unknown>
+            }>({
               distDir: this.distDir,
               projectDir,
               handleMissing: true,
@@ -454,8 +456,10 @@ export abstract class RouteModule<
         previewProps,
         serverFilesManifest,
         reactLoadableManifest,
-        clientReferenceManifest: (clientReferenceManifest as any)
-          ?.__RSC_MANIFEST?.[srcPage.replace(/%5F/g, '_')],
+        clientReferenceManifest:
+          clientReferenceManifest?.__RSC_MANIFEST?.[
+            srcPage.replace(/%5F/g, '_')
+          ],
         serverActionsManifest,
         subresourceIntegrityManifest,
         dynamicCssManifest,
@@ -564,7 +568,7 @@ export abstract class RouteModule<
 
       // we need to expose this on globalThis as the app-render
       // workStore grabs the incrementalCache from there
-      ;(globalThis as any).__incrementalCache = incrementalCache
+      globalThis.__incrementalCache = incrementalCache
       return incrementalCache
     }
   }
@@ -606,9 +610,7 @@ export abstract class RouteModule<
       )
     }
 
-    let serverFilesManifest = self.__SERVER_FILES_MANIFEST as
-      | RequiredServerFilesManifest
-      | undefined
+    let serverFilesManifest = self.__SERVER_FILES_MANIFEST
     const routerServerContext = this.getRouterServerContext(req)
     const nextConfig =
       routerServerContext?.nextConfig || serverFilesManifest?.config

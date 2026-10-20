@@ -184,6 +184,14 @@ import {
   computeLegacyCacheBustingSearchParam,
 } from '../shared/lib/router/utils/cache-busting-search-param'
 
+declare global {
+  /**
+   * Asset suffix (e.g. `?dpl=...`) appended by Turbopack-compiled code.
+   * @internal
+   */
+  var NEXT_CLIENT_ASSET_SUFFIX: string | undefined
+}
+
 export type FindComponentsResult<
   NextModule extends GenericComponentMod = GenericComponentMod,
 > = {
@@ -431,7 +439,7 @@ export default abstract class Server<
     | ServerComponentsHmrCache
     | undefined {
     return this.nextConfig.experimental.serverComponentsHmrCache
-      ? (globalThis as any).__serverComponentsHmrCache
+      ? globalThis.__serverComponentsHmrCache
       : undefined
   }
 
@@ -519,7 +527,7 @@ export default abstract class Server<
       this.deploymentId = id
       process.env.NEXT_DEPLOYMENT_ID = id
     }
-    ;(globalThis as any).NEXT_CLIENT_ASSET_SUFFIX =
+    globalThis.NEXT_CLIENT_ASSET_SUFFIX =
       this.nextConfig.supportsImmutableAssets || !this.deploymentId
         ? ''
         : `?dpl=${this.deploymentId}`
@@ -1564,7 +1572,7 @@ export default abstract class Server<
         addRequestMeta(req, 'incrementalCache', incrementalCache)
         // This is needed for pages router to leverage unstable_cache
         // TODO: re-work this handling to not use global and use a AsyncStore
-        ;(globalThis as any).__incrementalCache = incrementalCache
+        globalThis.__incrementalCache = incrementalCache
       }
 
       // set server components HMR cache to request meta so it can be passed
@@ -1667,14 +1675,16 @@ export default abstract class Server<
         if (finished) return
 
         const err = new Error()
-        ;(err as any).result = {
-          response: new Response(null, {
-            headers: {
-              'x-middleware-next': '1',
-            },
-          }),
-        }
-        ;(err as any).bubble = true
+        Object.assign(err, {
+          result: {
+            response: new Response(null, {
+              headers: {
+                'x-middleware-next': '1',
+              },
+            }),
+          },
+          bubble: true,
+        })
         throw err
       }
 

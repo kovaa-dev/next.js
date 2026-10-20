@@ -352,21 +352,25 @@ function warnCustomizedOption(
  */
 function assignDefaultsAndValidate(
   dir: string,
-  userConfig: NextConfig & { configFileName: string },
+  userConfig: NextConfig & {
+    configFileName: string
+    /** Removed option, still read here to print a migration warning. */
+    exportTrailingSlash?: boolean
+  },
   silent: boolean,
   phase: PHASE_TYPE
 ): NextConfigComplete {
   const configFileName = userConfig.configFileName
-  if (typeof (userConfig as any).exportTrailingSlash !== 'undefined') {
+  if (typeof userConfig.exportTrailingSlash !== 'undefined') {
     if (!silent) {
       Log.warn(
         `The "exportTrailingSlash" option has been renamed to "trailingSlash". Please update your ${configFileName}.`
       )
     }
     if (typeof userConfig.trailingSlash === 'undefined') {
-      userConfig.trailingSlash = (userConfig as any).exportTrailingSlash
+      userConfig.trailingSlash = userConfig.exportTrailingSlash
     }
-    delete (userConfig as any).exportTrailingSlash
+    delete userConfig.exportTrailingSlash
   }
 
   const config = Object.keys(userConfig).reduce<{ [key: string]: any }>(
@@ -2130,7 +2134,7 @@ async function loadConfigImpl(
       } else {
         userConfigModule = await import(pathToFileURL(path).href)
       }
-      const newEnv: typeof process.env = {} as any
+      const newEnv: Record<string, string | undefined> = {}
 
       for (const key of Object.keys(process.env)) {
         if (envBefore[key] !== process.env[key]) {

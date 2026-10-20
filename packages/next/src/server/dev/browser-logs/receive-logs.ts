@@ -390,8 +390,8 @@ async function handleDir(
   distDir: string
 ) {
   const loggableEntry = await prepareConsoleArgs(entry, ctx, distDir)
-  const consoleMethod =
-    (forwardConsole as any)[entry.method] || forwardConsole.log
+  const consoleMethod: (...args: Array<any>) => void =
+    forwardConsole[entry.method] || forwardConsole.log
 
   if (entry.consoleMethodStack) {
     const mapped = await getSourceMappedStackFrames(

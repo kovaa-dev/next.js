@@ -82,7 +82,7 @@ export async function createIncrementalCache({
     minimalMode: hasNextSupport,
   })
 
-  ;(globalThis as any).__incrementalCache = incrementalCache
+  globalThis.__incrementalCache = incrementalCache
 
   return incrementalCache
 }

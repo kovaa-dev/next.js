@@ -27,8 +27,13 @@ import { useImageConfig } from './use-image-config'
 import defaultLoader from 'next/dist/shared/lib/image-loader'
 import { useMergedRef } from './use-merged-ref'
 
+declare global {
+  /** @internal */
+  var __NEXT_IMAGE_IMPORTED: boolean | undefined
+}
+
 if (typeof window === 'undefined') {
-  ;(globalThis as any).__NEXT_IMAGE_IMPORTED = true
+  globalThis.__NEXT_IMAGE_IMPORTED = true
 }
 
 export type { ImageLoaderProps }

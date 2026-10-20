@@ -9,9 +9,13 @@ import { isRequestApiAllowedInCurrentPhase } from './utils'
 
 // A fulfilled thenable that React can unwrap synchronously via `use()` without
 // ever suspending. Reusing a single instance avoids allocating on every call.
-const resolvedIOPromise: Promise<void> = Promise.resolve(undefined)
-;(resolvedIOPromise as any).status = 'fulfilled'
-;(resolvedIOPromise as any).value = undefined
+const resolvedIOPromise: Promise<void> = Object.assign(
+  Promise.resolve(undefined),
+  {
+    status: 'fulfilled',
+    value: undefined,
+  }
+)
 
 /**
  * This function allows you to indicate that the code following it performs

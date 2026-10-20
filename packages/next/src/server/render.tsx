@@ -517,8 +517,7 @@ export async function renderToHTMLImpl(
 
   let Document = extra.Document
 
-  let Component: React.ComponentType<{}> | ((props: any) => JSX.Element) =
-    renderOpts.Component
+  let Component: NextComponentType = renderOpts.Component
   const OriginComponent = Component
 
   const isFallback = renderContext.isFallback ?? false
@@ -532,7 +531,7 @@ export async function renderToHTMLImpl(
   const defaultAppGetInitialProps =
     App.getInitialProps === (App as any).origGetInitialProps
 
-  const hasPageGetInitialProps = !!(Component as any)?.getInitialProps
+  const hasPageGetInitialProps = !!Component?.getInitialProps
   const hasPageScripts = (Component as any)?.unstable_scriptLoader
 
   const pageIsDynamic = isDynamicRoute(pathname)
@@ -1386,11 +1385,13 @@ export async function renderToHTMLImpl(
 
     let content: string | null
     if (hasDocumentGetInitialProps) {
-      documentInitialPropsRes = await loadDocumentInitialProps(renderShell)
-      if (documentInitialPropsRes === null) {
+      const loadedDocumentInitialProps =
+        await loadDocumentInitialProps(renderShell)
+      documentInitialPropsRes = loadedDocumentInitialProps
+      if (loadedDocumentInitialProps === null) {
         content = null
       } else {
-        const { docProps } = documentInitialPropsRes as any
+        const { docProps } = loadedDocumentInitialProps
         content = docProps.html
       }
     } else {

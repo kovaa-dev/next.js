@@ -25,6 +25,14 @@ declare global {
     __SUBRESOURCE_INTEGRITY_MANIFEST?: string
     __INTERCEPTION_ROUTE_REWRITE_MANIFEST?: string
   }
+  interface Document {
+    /** @internal Legacy IE-only property, not part of lib.dom. */
+    documentMode?: number
+  }
+  interface Navigator {
+    /** @internal Network Information API, not part of lib.dom. */
+    connection?: { saveData?: boolean; effectiveType: string }
+  }
 }
 
 interface LoadedEntrypointSuccess {
@@ -106,7 +114,7 @@ function hasPrefetch(link?: HTMLLinkElement): boolean {
     return (
       // detect IE11 since it supports prefetch but isn't detected
       // with relList.support
-      (!!window.MSInputMethodContext && !!(document as any).documentMode) ||
+      (!!window.MSInputMethodContext && !!document.documentMode) ||
       link.relList.supports('prefetch')
     )
   } catch {
@@ -400,7 +408,7 @@ export function createRouteLoader(assetPrefix: string): RouteLoader {
       // https://github.com/GoogleChromeLabs/quicklink/blob/453a661fa1fa940e2d2e044452398e38c67a98fb/src/index.mjs#L115-L118
       // License: Apache 2.0
       let cn
-      if ((cn = (navigator as any).connection)) {
+      if ((cn = navigator.connection)) {
         // Don't prefetch if using 2G or if Save-Data is enabled.
         if (cn.saveData || /2g/.test(cn.effectiveType)) return Promise.resolve()
       }

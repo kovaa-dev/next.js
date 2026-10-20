@@ -50,7 +50,7 @@ function getOriginModuleFromDependency(
 function getChunkGroupFromBlock(
   compilation: any,
   block: any
-): webpack.Compilation['chunkGroups'] {
+): webpack.ChunkGroup | undefined {
   return compilation.chunkGraph.getBlockChunkGroup(block)
 }
 
@@ -123,8 +123,7 @@ function buildManifest(
         // are already loaded. In this case we only need need
         // the module id and no files
         if (chunkGroup) {
-          for (const chunk of (chunkGroup as any)
-            .chunks as webpack.Compilation['chunks']) {
+          for (const chunk of chunkGroup.chunks) {
             chunk.files.forEach((file: string) => {
               if (
                 (file.endsWith('.js') || file.endsWith('.css')) &&

@@ -648,9 +648,10 @@ class NextTracerImpl implements NextTracer {
 
   public startSpan(type: SpanTypes): Span
   public startSpan(type: SpanTypes, options: TracerSpanOptions): Span
-  public startSpan(...args: Array<any>): Span {
-    const [type, passedOptions]: [string, TracerSpanOptions | undefined] =
-      args as any
+  public startSpan(
+    ...args: [type: SpanTypes, options?: TracerSpanOptions]
+  ): Span {
+    const [type, passedOptions] = args
     const options: TracerSpanOptions = passedOptions
       ? {
           ...passedOptions,

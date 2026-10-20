@@ -13,12 +13,15 @@ export default function NextPageDisallowReExportAllExports(): PluginObj<any> {
             'next/font/google',
           ].includes(path.node.source.value)
         ) {
-          const err = new SyntaxError(
-            `"next/font" requires SWC although Babel is being used due to a custom babel config being present.\nRead more: https://nextjs.org/docs/messages/babel-font-loader-conflict`
+          const err = Object.assign(
+            new SyntaxError(
+              `"next/font" requires SWC although Babel is being used due to a custom babel config being present.\nRead more: https://nextjs.org/docs/messages/babel-font-loader-conflict`
+            ),
+            {
+              code: 'BABEL_PARSE_ERROR',
+              loc: path.node.loc?.start ?? path.node.loc?.end ?? path.node.loc,
+            }
           )
-          ;(err as any).code = 'BABEL_PARSE_ERROR'
-          ;(err as any).loc =
-            path.node.loc?.start ?? path.node.loc?.end ?? path.node.loc
           throw err
         }
       },

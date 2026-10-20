@@ -746,7 +746,7 @@ export function printCustomRoutes({
         ├ permanent/statusCode
         └ destination
      */
-    const routesStr = (routes as any[])
+    const routesStr = routes
       .map((route: { source: string }) => {
         let routeStr = `┌ source: ${route.source}\n`
 
@@ -1127,7 +1127,7 @@ export async function isPageStatic({
           }))
       }
 
-      const isNextImageImported = (globalThis as any).__NEXT_IMAGE_IMPORTED
+      const isNextImageImported = globalThis.__NEXT_IMAGE_IMPORTED
 
       let isStatic = false
       if (!hasStaticProps && !hasGetInitialProps && !hasServerProps) {
@@ -1780,20 +1780,25 @@ export class NestedMiddlewareError extends Error {
 
 export { getSupportedBrowsers } from './get-supported-browsers'
 
+// The layer groups are arrays of literal layer names, so `includes` on them
+// wouldn't accept an arbitrary `WebpackLayerName` without widening.
+function inLayerGroup(
+  group: readonly WebpackLayerName[],
+  layer: WebpackLayerName
+): boolean {
+  return group.includes(layer)
+}
+
 export function shouldUseReactServerCondition(
   layer: WebpackLayerName | null | undefined
 ): boolean {
-  return Boolean(
-    layer && WEBPACK_LAYERS.GROUP.serverOnly.includes(layer as any)
-  )
+  return Boolean(layer && inLayerGroup(WEBPACK_LAYERS.GROUP.serverOnly, layer))
 }
 
 export function isWebpackClientOnlyLayer(
   layer: WebpackLayerName | null | undefined
 ): boolean {
-  return Boolean(
-    layer && WEBPACK_LAYERS.GROUP.clientOnly.includes(layer as any)
-  )
+  return Boolean(layer && inLayerGroup(WEBPACK_LAYERS.GROUP.clientOnly, layer))
 }
 
 export function isWebpackDefaultLayer(
@@ -1811,13 +1816,13 @@ export function isWebpackDefaultLayer(
 export function isWebpackBundledLayer(
   layer: WebpackLayerName | null | undefined
 ): boolean {
-  return Boolean(layer && WEBPACK_LAYERS.GROUP.bundled.includes(layer as any))
+  return Boolean(layer && inLayerGroup(WEBPACK_LAYERS.GROUP.bundled, layer))
 }
 
 export function isWebpackAppPagesLayer(
   layer: WebpackLayerName | null | undefined
 ): boolean {
-  return Boolean(layer && WEBPACK_LAYERS.GROUP.appPages.includes(layer as any))
+  return Boolean(layer && inLayerGroup(WEBPACK_LAYERS.GROUP.appPages, layer))
 }
 
 export function collectMeta({

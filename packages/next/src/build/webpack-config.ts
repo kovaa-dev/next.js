@@ -100,7 +100,10 @@ import type { InvalidImportLoaderOpts } from './webpack/loaders/next-invalid-imp
 import { defaultOverrides } from '../server/require-hook'
 import JSON5 from 'next/dist/compiled/json5'
 
-type ExcludesFalse = <T>(x: T | false) => x is T
+function excludesFalse<T>(x: T | false): x is T {
+  return Boolean(x)
+}
+
 type ClientEntries = {
   [key: string]: string | string[]
 }
@@ -978,7 +981,7 @@ export default async function getBaseWebpackConfig(
           // If esmExternals is not same as default value, it represents customized usage
           ['esmExternals', config.experimental.esmExternals !== true],
           SWCBinaryTarget,
-        ].filter<[Feature, boolean]>(Boolean as any)
+        ].filter((x): x is [Feature, boolean] => Boolean(x))
       )
     )
 
@@ -2239,7 +2242,7 @@ export default async function getBaseWebpackConfig(
           dir,
           defaultOverrides,
         }),
-    ].filter(Boolean as any as ExcludesFalse),
+    ].filter(excludesFalse),
   }
 
   // Support tsconfig and jsconfig baseUrl
@@ -2543,7 +2546,6 @@ export default async function getBaseWebpackConfig(
     assetPrefix: config.assetPrefix || '',
     sassOptions: config.sassOptions,
     productionBrowserSourceMaps: config.productionBrowserSourceMaps,
-    future: (config as any).future,
     experimental: config.experimental,
     disableStaticImages: config.images.disableStaticImages,
     transpilePackages: config.transpilePackages,
