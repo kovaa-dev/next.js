@@ -1,0 +1,19 @@
+error - [process module] /turbopack/crates/turbopack-tests/tests/execution/turbopack/resolving/require-context-unknown-type/input/index.js.require-context.cjs:3:12  Unknown module type
+       1 | // A context that matches a file without a module type must report an error at
+       2 | // the `require.context()` call. The value of this test is the `issues/` snapshot.
+         +             v
+       3 + const ctx = require.context('./content', false, /\.txt$/)
+         +             ^
+       4 | 
+       5 | it('should list the file', () => {
+       6 |   expect(ctx.keys()).toEqual(['./gamma.txt'])
+       7 | })
+  
+  turbopack/crates/turbopack-tests/tests/execution/turbopack/resolving/require-context-unknown-type/input/content/gamma.txt doesn't have an associated module type. Use a known file extension, or register a loader for it.
+  
+  Read more: https://nextjs.org/docs/app/api-reference/config/next-config-js/turbopack#configuring-webpack-loaders
+  
+  Import trace:
+    test:
+      ./turbopack/crates/turbopack-tests/tests/execution/turbopack/resolving/require-context-unknown-type/input/index.js.require-context.cjs
+      ./turbopack/crates/turbopack-tests/tests/execution/turbopack/resolving/require-context-unknown-type/input/index.js
