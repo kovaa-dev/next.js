@@ -2,6 +2,7 @@
 
 const defaultCacheHandler =
   require('next/dist/server/lib/cache-handlers/default.external').default
+const state = require('./write-failure-state')
 const { EventEmitter, once } = require('node:events')
 const outerWrites = new EventEmitter()
 const pendingOuterWrites = once(outerWrites, 'complete')
@@ -20,6 +21,15 @@ module.exports = {
   ...defaultCacheHandler,
   async set(cacheKey, pendingEntry) {
     const { tags } = await pendingEntry
+    if (tags.includes(`write-failure:${state.id}`)) {
+      if (tags.includes('write-failure-language:en')) {
+        state.failedLanguages.push('en')
+        throw new Error('expected English cache write failure')
+      }
+      await defaultCacheHandler.set(cacheKey, pendingEntry)
+      state.storedLanguages.push('fr')
+      return
+    }
     const outer = tags.find(
       (tag) => tag === 'nested-outer-one' || tag === 'nested-outer-two'
     )

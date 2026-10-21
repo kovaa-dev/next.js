@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto'
 import { nextTestSetup } from 'e2e-utils'
 import { hasErrorToast, retry, waitFor, waitForNoRedbox } from 'next-test-utils'
 import stripAnsi from 'strip-ansi'
@@ -128,6 +129,69 @@ describe('app-custom-cache-handler-errors - set throws', () => {
             '\n    at <unknown> ('
         )
       })
+    }
+  })
+})
+
+// @force-gate start
+describe('app-custom-cache-handler-errors - lookup recovery', () => {
+  const { next, isNextStart } = nextTestSetup({
+    files: __dirname,
+    skipStart: true,
+    env: { CACHE_HANDLER_THROW_ON: 'retry-get' },
+  })
+
+  beforeAll(async () => {
+    if (isNextStart) {
+      await next.start()
+    }
+  })
+
+  it('retries a shared failed lookup and shares its successful fill while the write is pending', async () => {
+    const id = randomUUID()
+    const outputIndex = next.cliOutput.length
+    const control = (action: string) =>
+      next.fetch(`/lookup-retry?id=${id}`, { method: 'POST', body: action })
+    const readState = () =>
+      next.fetch('/lookup-retry?state').then(
+        (response) =>
+          response.json() as Promise<{
+            lookupCount: number
+            writeStarted: boolean
+            writeCompleted: boolean
+            requestCompleted: boolean
+          }>
+      )
+    await control('hold')
+    const rendering = next.fetch(`/lookup-retry?id=${id}`)
+    try {
+      await retry(async () => {
+        expect(await readState()).toEqual({
+          lookupCount: 2,
+          writeStarted: true,
+          writeCompleted: false,
+          requestCompleted: true,
+        })
+      })
+      await control('release')
+      const response = await rendering
+      expect(response.status).toBe(200)
+      const body = await response.json()
+      expect(body.failures).toEqual([
+        'expected cache lookup failure',
+        'expected cache lookup failure',
+      ])
+      expect(body.first).toEqual(expect.any(Number))
+      expect(body.second).toBe(body.first)
+      await retry(async () => {
+        expect((await readState()).writeCompleted).toBe(true)
+      })
+      expect(next.cliOutput.slice(outputIndex)).not.toContain(
+        'unhandledRejection'
+      )
+    } finally {
+      await control('release')
+      await rendering
     }
   })
 })

@@ -385,6 +385,62 @@ describe('app-root-param-getters - cache dedup with root params', () => {
     files: join(__dirname, 'fixtures', 'use-cache-dedup'),
   })
 
+  beforeAll(async () => {
+    if (isNextDev) {
+      await next.render('/ca/en/write-failure')
+    }
+  })
+
+  // @force-gate !deploy
+  it('persists a joining root value after the shared producer cache write fails', async () => {
+    const id = `write-failure-${randomUUID()}`
+    const control = (action: string) =>
+      next.fetch(`/write-failure-control?id=${id}`, {
+        method: 'POST',
+        body: action,
+      })
+    const readState = () =>
+      next.fetch('/write-failure-control').then(
+        (response) =>
+          response.json() as Promise<{
+            startedLanguages: string[]
+            generatedLanguages: string[]
+            failedLanguages: string[]
+            storedLanguages: string[]
+          }>
+      )
+    await control('hold')
+    const english = next.render$(`/ca/en/write-failure?id=${id}`)
+    let french: ReturnType<typeof next.render$> | undefined
+    try {
+      await retry(async () => {
+        expect((await readState()).generatedLanguages).toEqual(['en'])
+      })
+      french = next.render$(`/ca/fr/write-failure?id=${id}`)
+      await retry(async () => {
+        const state = await readState()
+        expect(state.startedLanguages).toEqual(['en', 'fr'])
+        expect(state.generatedLanguages).toEqual(['en'])
+      })
+      await control('release')
+      const [englishPage, frenchPage] = await Promise.all([english, french])
+      expect(englishPage('#value').text()).toStartWith('en:')
+      const frenchValue = frenchPage('#value').text()
+      expect(frenchValue).toStartWith('fr:')
+      await retry(async () => {
+        const state = await readState()
+        expect(state.failedLanguages).toContain('en')
+        expect(state.storedLanguages).toContain('fr')
+      })
+      expect(
+        (await next.render$(`/ca/fr/write-failure?id=${id}`))('#value').text()
+      ).toBe(frenchValue)
+    } finally {
+      await control('release')
+      await Promise.allSettled([english, french])
+    }
+  })
+
   it('should key a joining outer cache by the root params read by its inner cache', async () => {
     const english = await next.render$('/ca/en/nested?prime=1')
     expect(english('#first').text()).toBe('en')
