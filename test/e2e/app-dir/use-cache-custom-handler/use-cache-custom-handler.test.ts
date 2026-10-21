@@ -227,7 +227,7 @@ describe('use-cache-custom-handler', () => {
   // Development serves front-cache hits before reconciling the backing cache.
   // Its serialized backing reads cannot reach both held lookups concurrently.
   // @force-gate start
-  it('currently shares a handler lookup across routes and serves old data after revalidatePath()', async () => {
+  it('regenerates data for a revalidated route while another route reads the same cache entry', async () => {
     const control = (action: string) =>
       next.fetch('/path-revalidation', { method: 'POST', body: action })
     const readLookupState = () =>
@@ -268,12 +268,11 @@ describe('use-cache-custom-handler', () => {
       expect((await control('release')).status).toBe(204)
       const [firstPage, secondPage] = await Promise.all([first, second])
       expect(firstPage('#data').text()).toBe(initial)
-      // TODO: Revalidate the second route without reusing the first route's
-      // handler answer.
-      expect(secondPage('#data').text()).toBe(initial)
+      expect(secondPage('#data').text()).not.toBe(initial)
       expect(secondPage('#data').text()).not.toBe('')
       expect((await readLookupState()).softTags).toEqual([
         expect.arrayContaining(['_N_T_/path-revalidation/a/page']),
+        expect.arrayContaining(['_N_T_/path-revalidation/b/page']),
       ])
     } finally {
       await control('release')
@@ -282,7 +281,7 @@ describe('use-cache-custom-handler', () => {
   })
 
   // @force-gate start
-  it('currently shares a pending fill without checking route-specific cache invalidation', async () => {
+  it('respects a route-specific handler miss after an observed fill finishes during lookup', async () => {
     const id = `observed-miss-${randomUUID()}`
     const pathname = `/path-revalidation?id=${id}`
     const control = (action: string) =>
@@ -329,13 +328,12 @@ describe('use-cache-custom-handler', () => {
       })
       await control('release-miss')
       const secondPage = await second
-      expect(secondPage('#data').text()).toBe(refreshed)
+      expect(secondPage('#data').text()).not.toBe(refreshed)
       expect(secondPage('#data').text()).not.toBe('')
       await retry(async () => {
         const state = await readState()
-        expect(state.misses).toHaveLength(0)
-        expect(state.fills).toHaveLength(2)
-        expect(state.writes).toHaveLength(2)
+        expect(state.fills).toHaveLength(3)
+        expect(state.writes).toHaveLength(3)
       })
     } finally {
       await control('release-fill')

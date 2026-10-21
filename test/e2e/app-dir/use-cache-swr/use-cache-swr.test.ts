@@ -352,7 +352,7 @@ describe('use-cache-swr', () => {
     }
   })
 
-  it('currently gives nested callers stale data after background revalidation completes', async () => {
+  it('reuses a completed background revalidation when outer caches need fresh data from the same stale lookup', async () => {
     const id = `caller-context-${randomUUID()}`
     const initial = await warmData(id)
     heldResponseKeys.add(`outer:${id}`)
@@ -365,7 +365,7 @@ describe('use-cache-swr', () => {
       releaseDataResponses(`outer:${id}`)
       const $ = await rendering
       expect($('#direct').text()).toBe(initial.value)
-      expect($('#first').text()).toBe(initial.value)
+      expect($('#first').text()).not.toBe(initial.value)
       expect($('#first').text()).not.toBe('')
       expect($('#second').text()).toBe($('#first').text())
       expect(dataRequestCountsByKey.get(`fill:${id}`)).toBe(2)
@@ -376,7 +376,7 @@ describe('use-cache-swr', () => {
     }
   })
 
-  it('currently delays a direct stale read behind a nested foreground fill', async () => {
+  it('serves stale data to a direct caller while an outer cache waits for the shared foreground fill', async () => {
     const id = `caller-context-${randomUUID()}`
     const initial = await warmData(id)
     heldResponseKeys.add(`fill:${id}`)
@@ -390,10 +390,18 @@ describe('use-cache-swr', () => {
         ).toBeGreaterThan(0)
       })
       releaseDataResponses(`direct-ready:${id}`)
+      await retry(
+        () => {
+          expect(
+            dataRequestCountsByKey.get(`direct-served:${id}`)
+          ).toBeGreaterThan(0)
+        },
+        5000,
+        100
+      )
       releaseDataResponses(`fill:${id}`)
       const $ = await rendering
-      expect($('#direct').text()).not.toBe(initial.value)
-      expect($('#direct').text()).toBe($('#outer').text())
+      expect($('#direct').text()).toBe(initial.value)
       expect($('#outer').text()).not.toBe(initial.value)
       expect($('#outer').text()).not.toBe('')
       expect(dataRequestCountsByKey.get(`fill:${id}`)).toBe(2)
