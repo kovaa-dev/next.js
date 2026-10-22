@@ -15,4 +15,5 @@ jobs:
       skipInstallBuild: 'yes'
       stepName: build-linux-x64
       runs_on_labels: '["ubuntu-latest"]'
+      rustBuildProfile: release
       uploadNativeArtifact: true
