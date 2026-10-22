@@ -1,0 +1,18 @@
+name: Build custom Next SWC
+
+on:
+  push:
+    branches:
+      - build/next-16.3.8-custom-swc
+
+jobs:
+  build-linux-x64:
+    permissions:
+      contents: read
+      id-token: write
+    uses: ./.github/workflows/build_reusable.yml
+    with:
+      skipInstallBuild: 'yes'
+      stepName: build-linux-x64
+      runs_on_labels: '["ubuntu-latest"]'
+      uploadNativeArtifact: true
